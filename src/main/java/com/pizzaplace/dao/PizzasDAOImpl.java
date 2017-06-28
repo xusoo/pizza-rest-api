@@ -4,10 +4,7 @@ import com.pizzaplace.entities.Pizza;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
+import javax.persistence.*;
 import java.util.List;
 
 @Repository
@@ -30,11 +27,11 @@ public class PizzasDAOImpl implements PizzasDAO {
 	public Pizza getPizza(int id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			try {
-				return entityManager.createQuery("SELECT p FROM Pizza p LEFT JOIN FETCH p.ingredients WHERE p.id = " + id, Pizza.class).getSingleResult();
-			} catch (NoResultException e) {
-				return null;
-			}
+			TypedQuery<Pizza> query = entityManager.createQuery("SELECT p FROM Pizza p LEFT JOIN FETCH p.ingredients WHERE p.id = :pizzaId", Pizza.class);
+			query.setParameter("pizzaId", id);
+			return query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
 		} finally {
 			entityManager.close();
 		}

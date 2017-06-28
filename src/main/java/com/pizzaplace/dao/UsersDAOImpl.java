@@ -4,10 +4,7 @@ import com.pizzaplace.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
+import javax.persistence.*;
 
 @Repository
 public class UsersDAOImpl implements UsersDAO {
@@ -19,11 +16,11 @@ public class UsersDAOImpl implements UsersDAO {
 	public User findUserByEmail(String email) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			try {
-				return entityManager.createQuery("SELECT u FROM User u WHERE u.email = \'" + email + "\'", User.class).getSingleResult();
-			} catch (NoResultException e) {
-				return null;
-			}
+			TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+			query.setParameter("email", email);
+			return query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
 		} finally {
 			entityManager.close();
 		}
